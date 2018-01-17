@@ -70,11 +70,7 @@ class App extends Component {
       <div className={classes.root}>
         <Grid container spacing={24}>
           <Grid item xs={12} lg={12}>
-            <Inputs
-              {...this.props}
-              {...this.state}
-              onChange={this.onChange.bind(this)}
-            />
+            <Inputs {...this.state} onChange={this.onChange.bind(this)} />
             <EnhancedTable {...this.props} {...this.state} />
           </Grid>
         </Grid>

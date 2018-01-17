@@ -1,5 +1,4 @@
 import React from 'react';
-import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Table, {
@@ -11,13 +10,8 @@ import Table, {
   TableRow,
   TableSortLabel
 } from 'material-ui/Table';
-import Typography from 'material-ui/Typography';
 import Paper from 'material-ui/Paper';
-import Checkbox from 'material-ui/Checkbox';
-import IconButton from 'material-ui/IconButton';
 import Tooltip from 'material-ui/Tooltip';
-import { lighten } from 'material-ui/styles/colorManipulator';
-import NumberFormat from 'react-number-format';
 
 const columnData = [
   { id: 'rank', numeric: false, disablePadding: true, label: 'Rank' },
@@ -62,7 +56,7 @@ class EnhancedTableHead extends React.Component {
   };
 
   render() {
-    const { order, orderBy, rowCount } = this.props;
+    const { order, orderBy } = this.props;
 
     return (
       <TableHead>
@@ -138,9 +132,9 @@ class EnhancedTable extends React.Component {
     }
 
     let data;
-    if (order === 'desc' && property == 'symbol') {
+    if (order === 'desc' && property === 'symbol') {
       data = this.state.data.sort((a, b) => (b[orderBy] < a[orderBy] ? -1 : 1));
-    } else if (order === 'asc' && property == 'symbol') {
+    } else if (order === 'asc' && property === 'symbol') {
       data = this.state.data.sort((a, b) => (a[orderBy] < b[orderBy] ? -1 : 1));
     } else if (order === 'desc') {
       data = this.state.data.sort(

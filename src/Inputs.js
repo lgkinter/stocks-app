@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { withStyles } from 'material-ui/styles';
-import TextField from 'material-ui/TextField';
 import NumberFormat from 'react-number-format';
 import PropTypes from 'prop-types';
 import Input, { InputLabel } from 'material-ui/Input';
@@ -24,7 +23,6 @@ class NumberFormatCustom extends React.Component {
       <NumberFormat
         {...this.props}
         onValueChange={values => {
-          console.log(values);
           this.props.onChange({
             target: {
               id: 'total_amount',
@@ -61,17 +59,12 @@ class Inputs extends Component {
     clearTimeout(this.timer);
     const field = e.target.id;
     const value = e.target.value;
-    // field === 'total_amount'
-    //   ? parseFloat(e.target.value.slice(1).replace(/,/g, ''))
-    //   : e.target.value;
-    console.log('Field Change', field, value);
     this.setState({ [field]: value });
     this.timer = setTimeout(this.triggerChange.bind(this), WAIT_INTERVAL);
   }
 
   triggerChange() {
     let { num_stocks, total_amount } = this.state;
-    console.log('Trigger', num_stocks, total_amount);
     total_amount = parseFloat(total_amount.slice(1).replace(/,/g, ''));
     this.props.onChange(num_stocks, total_amount);
   }
