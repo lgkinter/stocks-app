@@ -23,15 +23,15 @@ const columnData = [
     label: 'Earnings Yield'
   },
   { id: 'roic', numeric: true, disablePadding: false, label: 'ROIC' },
-  { id: 'score', numeric: true, disablePadding: false, label: 'Score' },
+  { id: 'value_calc', numeric: true, disablePadding: false, label: 'Score' },
   {
-    id: 'weight',
+    id: 'value_weight',
     numeric: true,
     disablePadding: false,
     label: 'Weight'
   },
   {
-    id: 'sales_price',
+    id: 'sale_price',
     numeric: true,
     disablePadding: false,
     label: 'Sale Price'
@@ -133,15 +133,15 @@ class EnhancedTable extends React.Component {
 
     let data;
     if (order === 'desc' && property === 'symbol') {
-      data = this.state.data.sort((a, b) => (b[orderBy] < a[orderBy] ? -1 : 1));
+      data = this.props.data.sort((a, b) => (b[orderBy] < a[orderBy] ? -1 : 1));
     } else if (order === 'asc' && property === 'symbol') {
-      data = this.state.data.sort((a, b) => (a[orderBy] < b[orderBy] ? -1 : 1));
+      data = this.props.data.sort((a, b) => (a[orderBy] < b[orderBy] ? -1 : 1));
     } else if (order === 'desc') {
-      data = this.state.data.sort(
+      data = this.props.data.sort(
         (a, b) => (parseFloat(b[orderBy]) < parseFloat(a[orderBy]) ? -1 : 1)
       );
     } else {
-      data = this.state.data.sort(
+      data = this.props.data.sort(
         (a, b) => (parseFloat(a[orderBy]) < parseFloat(b[orderBy]) ? -1 : 1)
       );
     }
