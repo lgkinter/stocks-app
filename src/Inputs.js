@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import Input, { InputLabel } from 'material-ui/Input';
 import { FormControl } from 'material-ui/Form';
 
-const WAIT_INTERVAL = 0;
+const WAIT_INTERVAL = 300;
 
 const styles = theme => ({
   container: {
@@ -24,8 +24,10 @@ class NumberFormatCustom extends React.Component {
       <NumberFormat
         {...this.props}
         onValueChange={values => {
+          console.log(values);
           this.props.onChange({
             target: {
+              id: 'total_amount',
               value: values.value
             }
           });
@@ -44,34 +46,35 @@ NumberFormatCustom.propTypes = {
 class Inputs extends Component {
   constructor(props) {
     super(props);
-
-    // this.state = {
-    //   num_stocks: this.props.num_stocks,
-    //   total_amount: this.props.total_amount
-    // };
+    this.onFieldChange = this.onFieldChange.bind(this);
+    this.state = {
+      num_stocks: this.props.num_stocks,
+      total_amount: `$${this.props.total_amount}`
+    };
   }
 
-  // componentWillMount() {
-  //   this.timer = null;
-  // }
+  componentWillMount() {
+    this.timer = null;
+  }
 
   onFieldChange(e) {
-    // clearTimeout(this.timer);
+    clearTimeout(this.timer);
     const field = e.target.id;
-    const value =
-      field === 'total_amount'
-        ? parseFloat(e.target.value.slice(1).replace(/,/g, ''))
-        : e.target.value;
-    // this.setState({ [field]: value });
-    this.props.onChange(field, value);
-    // this.timer = setTimeout(this.triggerChange.bind(this), WAIT_INTERVAL);
+    const value = e.target.value;
+    // field === 'total_amount'
+    //   ? parseFloat(e.target.value.slice(1).replace(/,/g, ''))
+    //   : e.target.value;
+    console.log('Field Change', field, value);
+    this.setState({ [field]: value });
+    this.timer = setTimeout(this.triggerChange.bind(this), WAIT_INTERVAL);
   }
 
-  // triggerChange() {
-  //   let { num_stocks, total_amount } = this.state;
-  //   total_amount = parseFloat(total_amount.slice(1).replace(/,/g, ''));
-  //   this.props.onChange(num_stocks, total_amount);
-  // }
+  triggerChange() {
+    let { num_stocks, total_amount } = this.state;
+    console.log('Trigger', num_stocks, total_amount);
+    total_amount = parseFloat(total_amount.slice(1).replace(/,/g, ''));
+    this.props.onChange(num_stocks, total_amount);
+  }
 
   render() {
     const { classes } = this.props;
@@ -84,19 +87,18 @@ class Inputs extends Component {
             type="number"
             min="0"
             step="1"
-            value={this.props.num_stocks}
-            onChange={this.onFieldChange.bind(this)}
+            value={this.state.num_stocks}
+            onChange={this.onFieldChange}
           />
         </FormControl>
         <FormControl className={classes.formControl}>
           <InputLabel htmlFor="total_amount">Total Amount</InputLabel>
           <Input
             id="total_amount"
-            label="Name"
+            type="text"
             inputComponent={NumberFormatCustom}
-            className={classes.textField}
-            value={this.props.total_amount}
-            onChange={this.onFieldChange.bind(this)}
+            value={this.state.total_amount}
+            onChange={this.onFieldChange}
           />
         </FormControl>
       </div>

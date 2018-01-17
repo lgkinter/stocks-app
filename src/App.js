@@ -33,8 +33,8 @@ class App extends Component {
     };
   }
 
-  onChange(field, value) {
-    this.setState({ [field]: value }, () => this.callApi());
+  onChange(num_stocks, total_amount) {
+    this.setState({ num_stocks, total_amount }, () => this.callApi());
   }
 
   componentDidMount() {
@@ -48,7 +48,6 @@ class App extends Component {
       }&size=${this.state.num_stocks}`
     )
       .then(results => {
-        console.log(results);
         return results.json();
       })
       .then(data => {
