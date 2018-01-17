@@ -58,14 +58,24 @@ class Inputs extends Component {
   onFieldChange(e) {
     clearTimeout(this.timer);
     const field = e.target.id;
-    const value = e.target.value;
+    let value = e.target.value;
+    if (field === 'num_stocks') {
+      value = value < 0 || !value ? '' : parseFloat(value);
+    } else {
+      value = parseFloat(value.replace(/\$/g, '')) <= 0 || !value ? '' : value;
+    }
     this.setState({ [field]: value });
-    this.timer = setTimeout(this.triggerChange.bind(this), WAIT_INTERVAL);
+    if (value !== '') {
+      this.timer = setTimeout(this.triggerChange.bind(this), WAIT_INTERVAL);
+    }
   }
 
   triggerChange() {
     let { num_stocks, total_amount } = this.state;
-    total_amount = parseFloat(total_amount.slice(1).replace(/,/g, ''));
+    total_amount =
+      total_amount === 0
+        ? 0
+        : parseFloat(total_amount.slice(1).replace(/,/g, ''));
     this.props.onChange(num_stocks, total_amount);
   }
 

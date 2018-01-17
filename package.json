@@ -17,5 +17,5 @@
     "eject": "react-scripts eject",
     "deploy": "npm run build&&gh-pages -d build"
   },
-  "homepage": "http://lgkinter.github.io/stocks-app"
+  "homepage": "https://lgkinter.github.io/stocks-app/"
 }
