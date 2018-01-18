@@ -51,6 +51,8 @@ class App extends Component {
         return results.json();
       })
       .then(data => {
+        let total = this.state.total_amount;
+        let amount_left = total;
         data.forEach(d => {
           d.rank = +d.rank;
           d.earnings_yield = parseFloat(d.earnings_yield).toFixed(2);
@@ -58,7 +60,13 @@ class App extends Component {
           d.value_calc = parseFloat(d.value_calc).toFixed(2);
           d.value_weight = parseFloat(d.value_weight).toFixed(2);
           d.sale_price = parseFloat(d.sale_price).toFixed(2);
-          d.total_cost = parseFloat(d.total_cost).toFixed(2);
+          //d.total_cost = parseFloat(d.total_cost).toFixed(2);
+          d.total_cost = Math.min(
+            Math.ceil(total * d.value_weight / d.sale_price) * d.sale_price,
+            Math.floor(amount_left / d.sale_price) * d.sale_price
+          );
+          d.shares_to_buy = d.total_cost / d.sale_price;
+          amount_left -= d.total_cost;
         });
         this.setState({ data });
       });
