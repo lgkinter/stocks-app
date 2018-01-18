@@ -64,8 +64,8 @@ class App extends Component {
           d.total_cost = Math.min(
             Math.ceil(total * d.value_weight / d.sale_price) * d.sale_price,
             Math.floor(amount_left / d.sale_price) * d.sale_price
-          );
-          d.shares_to_buy = d.total_cost / d.sale_price;
+          ).toFixed(2);
+          d.shares_to_buy = Math.round(d.total_cost / d.sale_price);
           amount_left -= d.total_cost;
         });
         this.setState({ data });
