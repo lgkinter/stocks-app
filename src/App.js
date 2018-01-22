@@ -34,8 +34,15 @@ class App extends Component {
 
   onDelete(symbol) {
     fetch(
-      'https://6rojikg4b0.execute-api.us-east-1.amazonaws.com/dev/exclusionlist/deletesymbol?symbol=' +
-        symbol
+      'https://6rojikg4b0.execute-api.us-east-1.amazonaws.com/dev/exclusionlist/deletesymbol',
+      {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ symbol })
+      }
     ).then(results => {
       console.log(results);
       this.callApi();
