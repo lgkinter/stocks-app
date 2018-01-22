@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
 .App {
   text-align: center;
 }
@@ -32,7 +34,7 @@
 }
 
 .details {
-  padding-left: 110px;
+  padding-left: 95px;
 }
 
 .EditColumn-cell-274 {
@@ -43,6 +45,53 @@
   padding: 0 !important;
 }
 
-tr:hover {
+tbody > tr:hover {
   background-color: #eef9fb !important;
+}
+
+td[colspan='12'] {
+  background-color: #f9f9f9 !important;
+}
+
+thead {
+  background-color: #f9f9f9;
+}
+
+label > span {
+  line-height: 1em !important;
+}
+
+#filter-title {
+  margin-left: 8px;
+  margin-top: -10px;
+  color: #303f9f;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+}
+
+#filter-hr-right {
+  display: inline-block;
+  margin-bottom: 7px;
+  margin-left: 8px;
+  width: 45%;
+  border: 0;
+  height: 2px;
+  background-image: -webkit-linear-gradient(left, #303f9f, #eef9fb);
+  background-image: -moz-linear-gradient(left, #303f9f, #eef9fb);
+  background-image: -ms-linear-gradient(left, #303f9f, #eef9fb);
+  background-image: -o-linear-gradient(left, #303f9f, #eef9fb);
+}
+
+#filter-hr-left {
+  display: inline-block;
+  margin-bottom: 7px;
+  margin-right: 8px;
+  width: 45%;
+  border: 0;
+  height: 2px;
+  background-image: -webkit-linear-gradient(left, #eef9fb, #303f9f);
+  background-image: -moz-linear-gradient(left, #eef9fb, #303f9f);
+  background-image: -ms-linear-gradient(left, #eef9fb, #303f9f);
+  background-image: -o-linear-gradient(left, #eef9fb, #303f9f);
 }

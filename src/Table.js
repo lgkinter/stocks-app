@@ -28,7 +28,6 @@ import {
   TableEditColumn,
   PagingPanel
 } from '@devexpress/dx-react-grid-material-ui';
-import { TableRow } from 'material-ui/Table';
 import DeleteIcon from 'material-ui-icons/Delete';
 
 // Delete button
@@ -43,48 +42,58 @@ DeleteButton.propTypes = {
 };
 
 // Row details
-const RowDetail = ({ row }) => (
-  <div className="details">
-    <p>{row.details.description}</p>
-    <p>Price at open: ${parseFloat(row.details.open).toFixed(2)}</p>
-    <p>
-      Highest trade price since open: ${parseFloat(row.details.high).toFixed(2)}
-    </p>
-    <p>
-      Lowest trade price since open: ${parseFloat(row.details.low).toFixed(2)}
-    </p>
-    <p>
-      Volume:{' '}
-      {parseFloat(row.details.volume).toLocaleString(undefined, {
-        maximumFractionDigits: 0
-      })}
-    </p>
-    <p>
-      Average volume:{' '}
-      {parseFloat(row.details.average_volume).toLocaleString(undefined, {
-        maximumFractionDigits: 0
-      })}
-    </p>
-    <p>
-      Highest trade price in the last 52 weeks: ${parseFloat(
-        row.details.high_52_weeks
-      ).toFixed(2)}
-    </p>
-    <p>
-      Lowest trade price in the last 52 weeks: ${parseFloat(
-        row.details.low_52_weeks
-      ).toFixed(2)}
-    </p>
-    <p>
-      Market cap:{' '}
-      {parseFloat(row.details.market_cap).toLocaleString(undefined, {
-        maximumFractionDigits: 0
-      })}
-    </p>
-    <p>Dividend yield: {parseFloat(row.details.dividend_yield)}</p>
-    <p>P/E ratio: {parseFloat(row.details.pe_ratio)}</p>
-  </div>
-);
+const RowDetail = ({ row }) => {
+  if (typeof row.details === 'undefined') {
+    return <div className="details">Unavailable</div>;
+  } else {
+    return (
+      <div className="details">
+        <p>{row.details.description}</p>
+        <p>Price at open: ${parseFloat(row.details.open).toFixed(2)}</p>
+        <p>
+          Highest trade price since open: ${parseFloat(
+            row.details.high
+          ).toFixed(2)}
+        </p>
+        <p>
+          Lowest trade price since open: ${parseFloat(row.details.low).toFixed(
+            2
+          )}
+        </p>
+        <p>
+          Volume:{' '}
+          {parseFloat(row.details.volume).toLocaleString(undefined, {
+            maximumFractionDigits: 0
+          })}
+        </p>
+        <p>
+          Average volume:{' '}
+          {parseFloat(row.details.average_volume).toLocaleString(undefined, {
+            maximumFractionDigits: 0
+          })}
+        </p>
+        <p>
+          Highest trade price in the last 52 weeks: ${parseFloat(
+            row.details.high_52_weeks
+          ).toFixed(2)}
+        </p>
+        <p>
+          Lowest trade price in the last 52 weeks: ${parseFloat(
+            row.details.low_52_weeks
+          ).toFixed(2)}
+        </p>
+        <p>
+          Market cap:{' '}
+          {parseFloat(row.details.market_cap).toLocaleString(undefined, {
+            maximumFractionDigits: 0
+          })}
+        </p>
+        <p>Dividend yield: {parseFloat(row.details.dividend_yield)}</p>
+        <p>P/E ratio: {parseFloat(row.details.pe_ratio)}</p>
+      </div>
+    );
+  }
+};
 
 RowDetail.propTypes = {
   row: PropTypes.any.isRequired
@@ -155,15 +164,15 @@ class TableComponent extends Component {
         { columnName: 'total_cost', align: 'right' }
       ],
       defaultColumnWidths: [
-        { columnName: 'rank', width: 70 },
-        { columnName: 'symbol', width: 90 },
-        { columnName: 'earnings_yield', width: 120 },
-        { columnName: 'roic', width: 105 },
-        { columnName: 'value_calc', width: 105 },
-        { columnName: 'value_weight', width: 105 },
-        { columnName: 'sale_price', width: 105 },
-        { columnName: 'shares_to_buy', width: 150 },
-        { columnName: 'total_cost', width: 120 }
+        { columnName: 'rank', width: this.props.width / 15 }, //70
+        { columnName: 'symbol', width: this.props.width / 12 }, //90
+        { columnName: 'earnings_yield', width: this.props.width / 9 }, //120
+        { columnName: 'roic', width: this.props.width / 10 }, //105
+        { columnName: 'value_calc', width: this.props.width / 10 }, //105
+        { columnName: 'value_weight', width: this.props.width / 10 }, //105
+        { columnName: 'sale_price', width: this.props.width / 10 }, //105
+        { columnName: 'shares_to_buy', width: this.props.width / 7 }, //150
+        { columnName: 'total_cost', width: this.props.width / 9 } //120
       ],
       currencyColumns: ['sale_price', 'total_cost'],
       percentageColumns: ['value_weight'],
@@ -192,12 +201,9 @@ class TableComponent extends Component {
       deletingRows
     } = this.state;
     const { classes, data } = this.props;
-    const tableRowTemplate = ({ tableRow, children, style }) => (
-      <TableRow hover>{children}</TableRow>
-    );
 
     return (
-      <Paper style={{ marginTop: '40px' }}>
+      <Paper style={{ marginTop: '40px', maxWidth: '1050px' }}>
         <Grid rows={data} columns={columnData}>
           <SortingState
             defaultSorting={[{ columnName: 'rank', direction: 'asc' }]}
@@ -211,10 +217,7 @@ class TableComponent extends Component {
           <PercentageTypeProvider for={percentageColumns} />
           <RowDetailState />
           <EditingState onCommitChanges={this.commitChanges} />
-          <Table
-            columnExtensions={tableColumnExtensions}
-            rowComponent={tableRowTemplate}
-          />
+          <Table columnExtensions={tableColumnExtensions} />
           <TableColumnResizing defaultColumnWidths={defaultColumnWidths} />
           <TableHeaderRow showSortingControls />
           <TableEditColumn
