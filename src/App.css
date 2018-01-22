@@ -31,6 +31,18 @@
   }
 }
 
-td {
-  padding: 4px 24px 4px 24px !important;
+.details {
+  padding-left: 110px;
+}
+
+.EditColumn-cell-274 {
+  padding: 0 !important;
+}
+
+.TableDetailToggleCell-toggleCell-263 {
+  padding: 0 !important;
+}
+
+tr:hover {
+  background-color: #eef9fb !important;
 }

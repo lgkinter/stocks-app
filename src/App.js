@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import './App.css';
-//import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
-//import Paper from 'material-ui/Paper';
 import Grid from 'material-ui/Grid';
 
-import EnhancedTable from './EnhancedTable';
+import EnhancedTable from './Table';
 import Inputs from './Inputs';
 
 const styles = theme => ({
@@ -16,11 +14,6 @@ const styles = theme => ({
     paddingLeft: theme.spacing.unit * 3,
     paddingRight: theme.spacing.unit * 3
   }
-  // paper: {
-  //   padding: 16,
-  //   textAlign: 'center',
-  //   color: theme.palette.text.secondary
-  // }
 });
 
 class App extends Component {
@@ -31,10 +24,22 @@ class App extends Component {
       num_stocks: 20,
       total_amount: 15000
     };
+    this.onChange = this.onChange.bind(this);
+    this.onDelete = this.onDelete.bind(this);
   }
 
   onChange(num_stocks, total_amount) {
     this.setState({ num_stocks, total_amount }, () => this.callApi());
+  }
+
+  onDelete(symbol) {
+    fetch(
+      'https://6rojikg4b0.execute-api.us-east-1.amazonaws.com/dev/exclusionlist/deletesymbol?symbol=' +
+        symbol
+    ).then(results => {
+      console.log(results);
+      this.callApi();
+    });
   }
 
   componentDidMount() {
@@ -47,13 +52,12 @@ class App extends Component {
         this.state.total_amount
       }&size=${this.state.num_stocks}`
     )
-      .then(results => {
-        return results.json();
-      })
+      .then(results => results.json())
       .then(data => {
         let total = this.state.total_amount;
         let amount_left = total;
-        data.forEach(d => {
+        data.forEach((d, i) => {
+          d.id = i;
           d.rank = +d.rank;
           d.earnings_yield = parseFloat(d.earnings_yield).toFixed(2);
           d.roic = parseFloat(d.roic).toFixed(2);
@@ -67,6 +71,9 @@ class App extends Component {
           ).toFixed(2);
           d.shares_to_buy = Math.round(d.total_cost / d.sale_price);
           amount_left -= d.total_cost;
+          fetch(`https://api.robinhood.com/fundamentals/${d.symbol}/`)
+            .then(results => results.json())
+            .then(detailData => (d.details = detailData));
         });
         this.setState({ data });
       });
@@ -74,12 +81,13 @@ class App extends Component {
 
   render() {
     const { classes } = this.props;
+    const props = { classes, onDelete: this.onDelete };
     return (
       <div className={classes.root}>
         <Grid container spacing={24}>
           <Grid item xs={12} lg={12}>
-            <Inputs {...this.state} onChange={this.onChange.bind(this)} />
-            <EnhancedTable {...this.props} {...this.state} />
+            <Inputs {...this.state} onChange={this.onChange} />
+            <EnhancedTable {...props} {...this.state} />
           </Grid>
         </Grid>
       </div>

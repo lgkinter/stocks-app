@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Table, {
@@ -50,7 +50,7 @@ const columnData = [
   }
 ];
 
-class EnhancedTableHead extends React.Component {
+class EnhancedTableHead extends Component {
   createSortHandler = property => event => {
     this.props.onRequestSort(event, property);
   };
@@ -111,7 +111,7 @@ const styles = theme => ({
   }
 });
 
-class EnhancedTable extends React.Component {
+class EnhancedTable extends Component {
   constructor(props, context) {
     super(props, context);
 

@@ -1,113 +1,260 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import {
+  Button,
+  IconButton,
+  Paper,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle
+} from 'material-ui';
+import {
+  DataTypeProvider,
+  EditingState,
+  PagingState,
+  IntegratedPaging,
+  SortingState,
+  IntegratedSorting,
+  RowDetailState
+} from '@devexpress/dx-react-grid';
+import {
+  Grid,
   Table,
-  TableBody,
-  TableHeader,
-  TableHeaderColumn,
-  TableRow,
-  TableRowColumn
-} from 'material-ui/Table';
+  TableColumnResizing,
+  TableHeaderRow,
+  TableRowDetail,
+  TableEditColumn,
+  PagingPanel
+} from '@devexpress/dx-react-grid-material-ui';
+import { TableRow } from 'material-ui/Table';
+import DeleteIcon from 'material-ui-icons/Delete';
+
+// Delete button
+const DeleteButton = ({ onExecute }) => (
+  <IconButton onClick={onExecute} title="Delete row">
+    <DeleteIcon />
+  </IconButton>
+);
+
+DeleteButton.propTypes = {
+  onExecute: PropTypes.func.isRequired
+};
+
+// Row details
+const RowDetail = ({ row }) => (
+  <div className="details">
+    <p>{row.details.description}</p>
+    <p>Price at open: ${parseFloat(row.details.open).toFixed(2)}</p>
+    <p>
+      Highest trade price since open: ${parseFloat(row.details.high).toFixed(2)}
+    </p>
+    <p>
+      Lowest trade price since open: ${parseFloat(row.details.low).toFixed(2)}
+    </p>
+    <p>
+      Volume:{' '}
+      {parseFloat(row.details.volume).toLocaleString(undefined, {
+        maximumFractionDigits: 0
+      })}
+    </p>
+    <p>
+      Average volume:{' '}
+      {parseFloat(row.details.average_volume).toLocaleString(undefined, {
+        maximumFractionDigits: 0
+      })}
+    </p>
+    <p>
+      Highest trade price in the last 52 weeks: ${parseFloat(
+        row.details.high_52_weeks
+      ).toFixed(2)}
+    </p>
+    <p>
+      Lowest trade price in the last 52 weeks: ${parseFloat(
+        row.details.low_52_weeks
+      ).toFixed(2)}
+    </p>
+    <p>
+      Market cap:{' '}
+      {parseFloat(row.details.market_cap).toLocaleString(undefined, {
+        maximumFractionDigits: 0
+      })}
+    </p>
+    <p>Dividend yield: {parseFloat(row.details.dividend_yield)}</p>
+    <p>P/E ratio: {parseFloat(row.details.pe_ratio)}</p>
+  </div>
+);
+
+RowDetail.propTypes = {
+  row: PropTypes.any.isRequired
+};
+
+// Currency formatting
+const CurrencyFormatter = ({ value }) =>
+  `$${parseFloat(value).toLocaleString(undefined, {
+    minimumFractionDigits: 2
+  })}`;
+
+CurrencyFormatter.propTypes = {
+  value: PropTypes.string.isRequired
+};
+
+const CurrencyTypeProvider = props => (
+  <DataTypeProvider formatterComponent={CurrencyFormatter} {...props} />
+);
+
+// Percentage formatting
+const PercentageFormatter = ({ value }) => Math.round(value * 100) + '%';
+
+PercentageFormatter.propTypes = {
+  value: PropTypes.string.isRequired
+};
+
+const PercentageTypeProvider = props => (
+  <DataTypeProvider formatterComponent={PercentageFormatter} {...props} />
+);
+
+// Column headings
+const columnData = [
+  { name: 'rank', title: 'Rank' },
+  { name: 'symbol', title: 'Symbol' },
+  { name: 'earnings_yield', title: 'Earnings Yield' },
+  { name: 'roic', title: 'ROIC' },
+  { name: 'value_calc', title: 'Score' },
+  { name: 'value_weight', title: 'Weight' },
+  { name: 'sale_price', title: 'Sale Price' },
+  { name: 'shares_to_buy', title: 'Number of Shares' },
+  { name: 'total_cost', title: 'Total Cost' }
+];
+
+const compareFloat = (a, b) => (parseFloat(a) < parseFloat(b) ? -1 : 1);
 
 class TableComponent extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
-      data: [],
-      tableRows: [],
-      fixedHeader: true,
-      stripedRows: true,
-      showRowHover: true,
-      //fixedFooter: true,
-      //selectable: true,
-      //multiSelectable: false,
-      //enableSelectAll: false,
-      //deselectOnClickaway: true,
-      showCheckboxes: false,
-      height: '600px'
+      pageSizes: [5, 10, 15, 0],
+      integratedSortingColumnExtensions: [
+        { columnName: 'rank', compare: compareFloat },
+        { columnName: 'earnings_yield', compare: compareFloat },
+        { columnName: 'roic', compare: compareFloat },
+        { columnName: 'value_calc', compare: compareFloat },
+        { columnName: 'sale_price', compare: compareFloat },
+        { columnName: 'total_cost', compare: compareFloat }
+      ],
+      tableColumnExtensions: [
+        { columnName: 'rank', align: 'right' },
+        { columnName: 'symbol', align: 'right' },
+        { columnName: 'earnings_yield', align: 'right' },
+        { columnName: 'roic', align: 'right' },
+        { columnName: 'value_calc', align: 'right' },
+        { columnName: 'value_weight', align: 'right' },
+        { columnName: 'sale_price', align: 'right' },
+        { columnName: 'shares_to_buy', align: 'right' },
+        { columnName: 'total_cost', align: 'right' }
+      ],
+      defaultColumnWidths: [
+        { columnName: 'rank', width: 70 },
+        { columnName: 'symbol', width: 90 },
+        { columnName: 'earnings_yield', width: 120 },
+        { columnName: 'roic', width: 105 },
+        { columnName: 'value_calc', width: 105 },
+        { columnName: 'value_weight', width: 105 },
+        { columnName: 'sale_price', width: 105 },
+        { columnName: 'shares_to_buy', width: 150 },
+        { columnName: 'total_cost', width: 120 }
+      ],
+      currencyColumns: ['sale_price', 'total_cost'],
+      percentageColumns: ['value_weight'],
+      deletingRows: []
+    };
+    this.commitChanges = ({ deleted }) =>
+      this.setState({ deletingRows: deleted || this.state.deletingRows });
+    this.cancelDelete = () => this.setState({ deletingRows: [] });
+    this.deleteRows = () => {
+      const data = this.props.data;
+      const deleteId = this.state.deletingRows[0];
+      const deleteElem = data.filter(row => deleteId === row.id)[0];
+      this.props.onDelete(deleteElem.symbol);
+      this.setState({ deletingRows: [] });
     };
   }
 
-  componentDidMount() {
-    this.callApi();
-  }
-
-  callApi() {
-    fetch(
-      'https://6rojikg4b0.execute-api.us-east-1.amazonaws.com/dev/getvaluetable?dollars=15000&size=20'
-    )
-      .then(results => {
-        return results.json();
-      })
-      .then(data => this.setState({ data }));
-  }
-
   render() {
-    const stocks = this.state.data.map(row => {
-      return (
-        <TableRow key={row.rank}>
-          <TableRowColumn>{row.rank}</TableRowColumn>
-          <TableRowColumn>{row.symbol}</TableRowColumn>
-          <TableRowColumn>{row.earnings_yield}</TableRowColumn>
-          <TableRowColumn>{row.roic}</TableRowColumn>
-          <TableRowColumn>{row.value_calc}</TableRowColumn>
-          <TableRowColumn>{row.value_weight}</TableRowColumn>
-          <TableRowColumn>{row.sale_price}</TableRowColumn>
-          <TableRowColumn>{row.shares_to_buy}</TableRowColumn>
-          <TableRowColumn>{row.total_cost}</TableRowColumn>
-        </TableRow>
-      );
-    });
+    const {
+      pageSizes,
+      integratedSortingColumnExtensions,
+      tableColumnExtensions,
+      defaultColumnWidths,
+      currencyColumns,
+      percentageColumns,
+      deletingRows
+    } = this.state;
+    const { classes, data } = this.props;
+    const tableRowTemplate = ({ tableRow, children, style }) => (
+      <TableRow hover>{children}</TableRow>
+    );
 
     return (
-      <Table
-        height={this.state.height}
-        fixedHeader={this.state.fixedHeader}
-        fixedFooter={this.state.fixedFooter}
-        selectable={this.state.selectable}
-        multiSelectable={this.state.multiSelectable}
-      >
-        <TableHeader
-          displaySelectAll={this.state.showCheckboxes}
-          adjustForCheckbox={this.state.showCheckboxes}
-          enableSelectAll={this.state.enableSelectAll}
+      <Paper style={{ marginTop: '40px' }}>
+        <Grid rows={data} columns={columnData}>
+          <SortingState
+            defaultSorting={[{ columnName: 'rank', direction: 'asc' }]}
+          />
+          <IntegratedSorting
+            columnExtensions={integratedSortingColumnExtensions}
+          />
+          <PagingState defaultCurrentPage={0} defaultPageSize={5} />
+          <IntegratedPaging />
+          <CurrencyTypeProvider for={currencyColumns} />
+          <PercentageTypeProvider for={percentageColumns} />
+          <RowDetailState />
+          <EditingState onCommitChanges={this.commitChanges} />
+          <Table
+            columnExtensions={tableColumnExtensions}
+            rowComponent={tableRowTemplate}
+          />
+          <TableColumnResizing defaultColumnWidths={defaultColumnWidths} />
+          <TableHeaderRow showSortingControls />
+          <TableEditColumn
+            width={20}
+            showDeleteCommand
+            commandComponent={DeleteButton}
+          />
+          <TableRowDetail className="detail-row" contentComponent={RowDetail} />
+          <PagingPanel pageSizes={pageSizes} />
+        </Grid>
+        <Dialog
+          open={!!deletingRows.length}
+          onClose={this.cancelDelete}
+          classes={{ paper: classes.dialog }}
         >
-          <TableRow>
-            <TableHeaderColumn tooltip="Rank">Rank</TableHeaderColumn>
-            <TableHeaderColumn tooltip="Ticker Symbol">
-              Symbol
-            </TableHeaderColumn>
-            <TableHeaderColumn tooltip="Earning Yield">
-              Earnings Yield
-            </TableHeaderColumn>
-            <TableHeaderColumn tooltip="Return on Invested Capital">
-              ROIC
-            </TableHeaderColumn>
-            <TableHeaderColumn tooltip="Computed Value">
-              Value
-            </TableHeaderColumn>
-            <TableHeaderColumn tooltip="Weighted Value">
-              Value Weight
-            </TableHeaderColumn>
-            <TableHeaderColumn tooltip="Closing Stock Price Value">
-              Sale Price
-            </TableHeaderColumn>
-            <TableHeaderColumn tooltip="Number of shares to purchase">
-              Number of Shares
-            </TableHeaderColumn>
-            <TableHeaderColumn tooltip="Total Cost of Shares">
-              Total Cost
-            </TableHeaderColumn>
-          </TableRow>
-        </TableHeader>
-        <TableBody
-          displayRowCheckbox={this.state.showCheckboxes}
-          deselectOnClickaway={this.state.deselectOnClickaway}
-          showRowHover={this.state.showRowHover}
-          stripedRows={this.state.stripedRows}
-        >
-          {stocks}
-        </TableBody>
-      </Table>
+          <DialogTitle>Delete Row</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Are you sure to delete the following row?
+            </DialogContentText>
+            <Paper>
+              <Grid
+                rows={data.filter(row => deletingRows.indexOf(row.id) > -1)}
+                columns={columnData}
+              >
+                <Table columnExtensions={tableColumnExtensions} />
+                <TableHeaderRow />
+              </Grid>
+            </Paper>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.cancelDelete} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={this.deleteRows} color="accent">
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Paper>
     );
   }
 }
