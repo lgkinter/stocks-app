@@ -58,9 +58,9 @@ class App extends Component {
     //   .then(data => {
     //     console.log(data);
     //   });
-
+    console.log(JSON.stringify({ symbol }));
     fetch(
-      'https://6rojikg4b0.execute-api.us-east-1.amazonaws.com/dev/exclusionlist/deletesymbol',
+      'https://6rojikg4b0.execute-api.us-east-1.amazonaws.com/dev/exclusionlist/insertsymbol',
       {
         method: 'POST',
         headers: {
@@ -92,27 +92,34 @@ class App extends Component {
   }
 
   callApi() {
+    let market_cap_arr = [];
+    if (this.state.small) market_cap_arr.push('small');
+    if (this.state.medium) market_cap_arr.push('medium');
+    if (this.state.large) market_cap_arr.push('large');
+
+    let industry_arr = [];
+    if (this.state.basic_industries) industry_arr.push('basic+industries');
+    if (this.state.capital_goods) industry_arr.push('capital+goods');
+    if (this.state.consumer_nondurables)
+      industry_arr.push('consumer+non-durables');
+    if (this.state.consumer_durables) industry_arr.push('consumer+durables');
+    if (this.state.consumer_services) industry_arr.push('consumer+services');
+    if (this.state.energy) industry_arr.push('energy');
+    if (this.state.finance) industry_arr.push('finance');
+    if (this.state.health_care) industry_arr.push('health+care');
+    if (this.state.public_utilities) industry_arr.push('public+utilities');
+    if (this.state.transportation) industry_arr.push('transportation');
+    if (this.state.technology) industry_arr.push('technology');
+    if (this.state.miscellaneous) industry_arr.push('miscellaneous');
+
     let queryParams = `?dollars=${this.state.total_amount}&size=${
       this.state.num_stocks
     }`;
-    if (this.state.small) queryParams += `&marketcap=small`;
-    if (this.state.medium) queryParams += `&marketcap=medium`;
-    if (this.state.large) queryParams += `&marketcap=large`;
-    if (this.state.basic_industries) queryParams += `&sector=basic+industries`;
-    if (this.state.capital_goods) queryParams += `&sector=capital+goods`;
-    if (this.state.consumer_nondurables)
-      queryParams += `&sector=consumer+non-durables`;
-    if (this.state.consumer_durables)
-      queryParams += `&sector=consumer+durables`;
-    if (this.state.consumer_services)
-      queryParams += `&sector=consumer+services`;
-    if (this.state.energy) queryParams += `&sector=energy`;
-    if (this.state.finance) queryParams += `&sector=finance`;
-    if (this.state.health_care) queryParams += `&sector=health+care`;
-    if (this.state.public_utilities) queryParams += `&sector=public+utilities`;
-    if (this.state.transportation) queryParams += `&sector=transportation`;
-    if (this.state.technology) queryParams += `&sector=technology`;
-    if (this.state.miscellaneous) queryParams += `&sector=miscellaneous`;
+    if (market_cap_arr.length > 0)
+      queryParams += `&marketcap=${market_cap_arr.join()}`;
+    if (industry_arr.length > 0)
+      queryParams += `&sector=${industry_arr.join()}`;
+    console.log(queryParams);
 
     fetch(
       `https://6rojikg4b0.execute-api.us-east-1.amazonaws.com/dev/getvaluetable${queryParams}`
