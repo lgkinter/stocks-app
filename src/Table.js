@@ -233,10 +233,10 @@ class TableComponent extends Component {
           onClose={this.cancelDelete}
           classes={{ paper: classes.dialog }}
         >
-          <DialogTitle>Delete Row</DialogTitle>
+          <DialogTitle>Hide Row</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Are you sure to delete the following row?
+              Are you sure you want to hide the following row?
             </DialogContentText>
             <Paper>
               <Grid
@@ -253,7 +253,7 @@ class TableComponent extends Component {
               Cancel
             </Button>
             <Button onClick={this.deleteRows} color="accent">
-              Delete
+              Hide Row
             </Button>
           </DialogActions>
         </Dialog>
