@@ -11,18 +11,33 @@ const styles = theme => ({
   root: {
     flexGrow: 1,
     margin: '40px auto',
-    maxWidth: '1050px',
+    maxWidth: '1100px',
     paddingLeft: theme.spacing.unit * 3,
     paddingRight: theme.spacing.unit * 3
   }
 });
+
+const industries = [
+  'basic_industries',
+  'capital_goods',
+  'consumer_nondurables',
+  'consumer_durables',
+  'consumer_services',
+  'energy',
+  'finance',
+  'health_care',
+  'public_utilities',
+  'transportation',
+  'technology',
+  'miscellaneous'
+];
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       data: [],
-      width: Math.min(window.innerWidth, 1050),
+      width: Math.min(window.innerWidth, 1100),
       num_stocks: 20,
       total_amount: 15000,
       small: true,
@@ -47,7 +62,17 @@ class App extends Component {
   }
 
   onChange(field, value) {
-    this.setState({ [field]: value }, () => this.callApi());
+    if (field === 'industries' && value === 'all') {
+      let updateIndustries = {};
+      industries.forEach(industry => (updateIndustries[industry] = true));
+      this.setState(updateIndustries, () => this.callApi());
+    } else if (field === 'industries' && value === 'none') {
+      let updateIndustries = {};
+      industries.forEach(industry => (updateIndustries[industry] = false));
+      this.setState(updateIndustries, () => this.callApi());
+    } else {
+      this.setState({ [field]: value }, () => this.callApi());
+    }
   }
 
   onDelete(symbol) {
@@ -87,7 +112,7 @@ class App extends Component {
   }
 
   updateDimensions() {
-    const updated_width = Math.min(window.innerWidth, 1050);
+    const updated_width = Math.min(window.innerWidth, 1100);
     this.setState({ width: updated_width });
   }
 
@@ -96,6 +121,7 @@ class App extends Component {
     if (this.state.small) market_cap_arr.push('small');
     if (this.state.medium) market_cap_arr.push('medium');
     if (this.state.large) market_cap_arr.push('large');
+    if (market_cap_arr.length === 3) market_cap_arr = [];
 
     let industry_arr = [];
     if (this.state.basic_industries) industry_arr.push('basic+industries');
@@ -111,6 +137,7 @@ class App extends Component {
     if (this.state.transportation) industry_arr.push('transportation');
     if (this.state.technology) industry_arr.push('technology');
     if (this.state.miscellaneous) industry_arr.push('miscellaneous');
+    if (industry_arr.length === 12) industry_arr = [];
 
     let queryParams = `?dollars=${this.state.total_amount}&size=${
       this.state.num_stocks
@@ -169,7 +196,11 @@ class App extends Component {
       <div className={classes.root}>
         <Grid container spacing={24}>
           <Grid item xs={12} lg={12}>
-            <Inputs {...this.state} onChange={this.onChange} />
+            <Inputs
+              {...this.state}
+              onChange={this.onChange}
+              industries={industries}
+            />
             <EnhancedTable {...props} {...this.state} />
           </Grid>
         </Grid>

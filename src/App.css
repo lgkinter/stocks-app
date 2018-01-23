@@ -95,3 +95,18 @@ label > span {
   background-image: -ms-linear-gradient(left, #eef9fb, #303f9f);
   background-image: -o-linear-gradient(left, #eef9fb, #303f9f);
 }
+
+#select-all-group {
+  position: absolute;
+  right: 18px;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+#select-none {
+  margin-right: 10px;
+  cursor: pointer;
+}
+#select-all {
+  margin-left: 10px;
+  cursor: pointer;
+}

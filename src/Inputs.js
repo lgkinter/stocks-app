@@ -54,6 +54,8 @@ class Inputs extends Component {
     super(props);
     this.onFieldChange = this.onFieldChange.bind(this);
     this.handleCheckbox = this.handleCheckbox.bind(this);
+    this.selectAll = this.selectAll.bind(this);
+    this.selectNone = this.selectNone.bind(this);
     this.state = {
       num_stocks: this.props.num_stocks,
       total_amount: `$${this.props.total_amount}`,
@@ -80,8 +82,31 @@ class Inputs extends Component {
   }
 
   handleCheckbox = name => (e, checked) => {
-    this.setState({ [name]: checked }, () => this.triggerChange(name, checked));
+    this.setState({ [name]: checked }, () =>
+      this.props.onChange(name, checked)
+    );
   };
+
+  selectNone() {
+    let updateIndustries = {};
+    this.props.industries.forEach(
+      industry => (updateIndustries[industry] = false)
+    );
+    this.setState(updateIndustries, () =>
+      this.props.onChange('industries', 'none')
+    );
+    //figure out triggerChange
+  }
+
+  selectAll() {
+    let updateIndustries = {};
+    this.props.industries.forEach(
+      industry => (updateIndustries[industry] = true)
+    );
+    this.setState(updateIndustries, () =>
+      this.props.onChange('industries', 'all')
+    );
+  }
 
   onFieldChange(e) {
     clearTimeout(this.timer);
@@ -117,9 +142,7 @@ class Inputs extends Component {
           <hr id="filter-hr-left" />Filters<hr id="filter-hr-right" />
         </h2>
         <Grid container spacing={24}>
-          {/*<div className={classes.container}>
-          <div style={{ width: '220px' }}>*/}
-          <Grid item xs={6} sm={2}>
+          <Grid item xs={6} sm={3}>
             <FormLabel
               component="legend"
               style={{ marginLeft: '8px', marginBottom: '9px' }}
@@ -185,9 +208,18 @@ class Inputs extends Component {
               </FormGroup>
             </FormControl>
           </Grid>
-          <Grid item xs={8} sm={8}>
+          <Grid item xs={8} sm={7}>
             <FormControl component="fieldset">
-              <FormLabel component="legend">Industries</FormLabel>
+              <FormLabel component="legend">
+                Industries<span id="select-all-group">
+                  <span id="select-none" onClick={this.selectNone}>
+                    Unselect All
+                  </span>|
+                  <span id="select-all" onClick={this.selectAll}>
+                    Select All
+                  </span>
+                </span>
+              </FormLabel>
               <FormGroup>
                 <Grid container spacing={8}>
                   <Grid item xs={6} sm={3}>

@@ -171,7 +171,7 @@ class TableComponent extends Component {
         { columnName: 'value_calc', width: this.props.width / 10 }, //105
         { columnName: 'value_weight', width: this.props.width / 10 }, //105
         { columnName: 'sale_price', width: this.props.width / 10 }, //105
-        { columnName: 'shares_to_buy', width: this.props.width / 7 }, //150
+        { columnName: 'shares_to_buy', width: this.props.width / 8 }, //150
         { columnName: 'total_cost', width: this.props.width / 9 } //120
       ],
       currencyColumns: ['sale_price', 'total_cost'],
@@ -203,7 +203,7 @@ class TableComponent extends Component {
     const { classes, data } = this.props;
 
     return (
-      <Paper style={{ marginTop: '40px', maxWidth: '1050px' }}>
+      <Paper style={{ marginTop: '40px', maxWidth: '1100px' }}>
         <Grid rows={data} columns={columnData}>
           <SortingState
             defaultSorting={[{ columnName: 'rank', direction: 'asc' }]}
