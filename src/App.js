@@ -76,14 +76,6 @@ class App extends Component {
   }
 
   onDelete(symbol) {
-    // fetch(
-    //   'https://6rojikg4b0.execute-api.us-east-1.amazonaws.com/dev/getmetricsbysymbol/?symbol=BBY'
-    // )
-    //   .then(results => results.json())
-    //   .then(data => {
-    //     console.log(data);
-    //   });
-    console.log(JSON.stringify({ symbol }));
     fetch(
       'https://6rojikg4b0.execute-api.us-east-1.amazonaws.com/dev/exclusionlist/insertsymbol',
       {
@@ -94,10 +86,7 @@ class App extends Component {
         },
         body: JSON.stringify({ symbol })
       }
-    ).then(results => {
-      console.log(results);
-      this.callApi();
-    });
+    ).then(results => this.callApi());
   }
   componentWillMount() {
     this.callApi();
@@ -121,7 +110,12 @@ class App extends Component {
     if (this.state.small) market_cap_arr.push('small');
     if (this.state.medium) market_cap_arr.push('medium');
     if (this.state.large) market_cap_arr.push('large');
-    if (market_cap_arr.length === 3) market_cap_arr = [];
+    //if (market_cap_arr.length === 3) market_cap_arr = [];
+    if (market_cap_arr.length === 3) {
+      market_cap_arr = [];
+    } else if (market_cap_arr.length === 0) {
+      market_cap_arr = ['none'];
+    }
 
     let industry_arr = [];
     if (this.state.basic_industries) industry_arr.push('basic+industries');
@@ -137,7 +131,11 @@ class App extends Component {
     if (this.state.transportation) industry_arr.push('transportation');
     if (this.state.technology) industry_arr.push('technology');
     if (this.state.miscellaneous) industry_arr.push('miscellaneous');
-    if (industry_arr.length === 12) industry_arr = [];
+    if (industry_arr.length === 12) {
+      industry_arr = [];
+    } else if (industry_arr.length === 0) {
+      industry_arr = ['none'];
+    }
 
     let queryParams = `?dollars=${this.state.total_amount}&size=${
       this.state.num_stocks
@@ -151,7 +149,11 @@ class App extends Component {
     fetch(
       `https://6rojikg4b0.execute-api.us-east-1.amazonaws.com/dev/getvaluetable${queryParams}`
     )
-      .then(results => results.json())
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
       .then(data => {
         let total = this.state.total_amount;
         let amount_left = total;
@@ -186,6 +188,10 @@ class App extends Component {
             });
         });
         this.setState({ data });
+      })
+      .catch(error => {
+        console.log('Incorrect parameters');
+        this.setState({ data: [] });
       });
   }
 
