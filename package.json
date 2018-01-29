@@ -6,13 +6,17 @@
     "@devexpress/dx-react-core": "^1.0.0-rc.1",
     "@devexpress/dx-react-grid": "^1.0.0-rc.1",
     "@devexpress/dx-react-grid-material-ui": "^1.0.0-rc.1",
+    "amazon-cognito-identity-js": "^1.31.0",
+    "aws-sdk": "^2.188.0",
     "gh-pages": "^1.1.0",
-    "material-ui": "^1.0.0-beta.29",
+    "material-ui": "^1.0.0-beta.30",
     "material-ui-icons": "^1.0.0-beta.17",
     "prop-types": "^15.6.0",
     "react": "^16.2.0",
+    "react-bootstrap": "^0.32.1",
     "react-dom": "^16.2.0",
     "react-number-format": "^3.1.3",
+    "react-router-dom": "^4.2.2",
     "react-scripts": "1.1.0"
   },
   "scripts": {

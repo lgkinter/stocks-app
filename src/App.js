@@ -1,4 +1,12 @@
 import React, { Component } from 'react';
+import { withRouter } from "react-router-dom";
+//import { Nav, Navbar } from "react-bootstrap";
+import AppBar from 'material-ui/AppBar';
+import Toolbar from 'material-ui/Toolbar';
+import Typography from 'material-ui/Typography';
+import Button from 'material-ui/Button';
+import IconButton from 'material-ui/IconButton';
+import MenuIcon from 'material-ui-icons/Menu';
 import './App.css';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
@@ -6,6 +14,8 @@ import Grid from 'material-ui/Grid';
 
 import EnhancedTable from './Table';
 import Inputs from './Inputs';
+import Routes from "./Routes";
+import { authUser, signOutUser } from "./libs/awsLib";
 
 const styles = theme => ({
   root: {
@@ -14,6 +24,13 @@ const styles = theme => ({
     maxWidth: '1100px',
     paddingLeft: theme.spacing.unit * 3,
     paddingRight: theme.spacing.unit * 3
+  },
+  flex: {
+      flex: 1,
+  },
+  menuButton: {
+      marginLeft: -12,
+      marginRight: 20,
   }
 });
 
@@ -54,11 +71,25 @@ class App extends Component {
       public_utilities: true,
       transportation: true,
       technology: true,
-      miscellaneous: true
+      miscellaneous: true,
+      isAuthenticated: false,
+      isAuthenticating: true
     };
     this.onChange = this.onChange.bind(this);
     this.onDelete = this.onDelete.bind(this);
     this.updateDimensions = this.updateDimensions.bind(this);
+  }
+
+  userHasAuthenticated = authenticated => {
+      this.setState({ isAuthenticated: authenticated });
+  }
+
+  handleLogout = event => {
+      signOutUser();
+
+      this.userHasAuthenticated(false);
+
+      this.props.history.push("/login");
   }
 
   onChange(field, value) {
@@ -77,7 +108,7 @@ class App extends Component {
 
   onDelete(symbol) {
     fetch(
-      'https://6rojikg4b0.execute-api.us-east-1.amazonaws.com/dev/exclusionlist/insertsymbol',
+      'https://6rojikg4b0.execute-api.us-east-1.amazonaws.com/prod/exclusionlist/insertsymbol',
       {
         method: 'POST',
         headers: {
@@ -92,8 +123,19 @@ class App extends Component {
     this.callApi();
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     window.addEventListener('resize', this.updateDimensions);
+
+      try {
+          if (await authUser()) {
+              this.userHasAuthenticated(true);
+          }
+      }
+      catch(e) {
+          alert(e);
+      }
+
+      this.setState({ isAuthenticating: false });
   }
 
   componentWillUnmount() {
@@ -147,7 +189,7 @@ class App extends Component {
     console.log(queryParams);
 
     fetch(
-      `https://6rojikg4b0.execute-api.us-east-1.amazonaws.com/dev/getvaluetable${queryParams}`
+      `https://6rojikg4b0.execute-api.us-east-1.amazonaws.com/prod/getvaluetable${queryParams}`
     )
       .then(response => {
         if (response.ok) {
@@ -198,18 +240,32 @@ class App extends Component {
   render() {
     const { classes } = this.props;
     const props = { classes, onDelete: this.onDelete };
+    const childProps = {
+        isAuthenticated: this.state.isAuthenticated,
+        userHasAuthenticated: this.userHasAuthenticated,
+        classes,
+        props
+    };
     return (
+      !this.state.isAuthenticating &&
       <div className={classes.root}>
-        <Grid container spacing={24}>
-          <Grid item xs={12} lg={12}>
-            <Inputs
-              {...this.state}
-              onChange={this.onChange}
-              industries={industries}
-            />
-            <EnhancedTable {...props} {...this.state} />
-          </Grid>
-        </Grid>
+          <AppBar position="static">
+              <Toolbar>
+                  <IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
+                      <MenuIcon />
+                  </IconButton>
+                  <Typography type="title" color="inherit" className={classes.flex}>
+                      Stocks-App
+                  </Typography>
+                  {this.state.isAuthenticated
+                      ? <Button color="inherit" onClick={this.handleLogout}>Logout</Button>
+                      : [
+                          <Button color="inherit" key={1} href="/login">Login</Button>,
+                          <Button color="inherit" key={2} href="/signup">Signup</Button>
+                      ]}
+              </Toolbar>
+          </AppBar>
+          <Routes childProps={childProps} />
       </div>
     );
   }
@@ -219,4 +275,4 @@ App.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(App);
+export default withStyles(styles)(withRouter(App));
